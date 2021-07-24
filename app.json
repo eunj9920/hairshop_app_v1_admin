@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "강우리헤어 관리자용",
+    "slug": "hairshop_app_v1_admin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon_hairshop.png",
+    "splash": {
+      "image": "./assets/splash_hairshop.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "icon": "./assets/icon_hairshop.png",
+      "supportsTablet": true
+    },
+    "android": {
+      "icon": "./assets/icon_hairshop.png",
+      "package": "com.hairshop.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon_hairshop.png"
+    }
+  }
+}
