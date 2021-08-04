@@ -1,13 +1,9 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, TextInput, KeyboardAvoidingView, Platform } from "react-native";
-import { TopNav, themeColor} from "react-native-rapi-ui";
-import { Ionicons } from '@expo/vector-icons'; 
 import { Constants, View, Button } from 'react-native-ui-lib';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Picker} from '@react-native-picker/picker';
 import axios from "axios"
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 
 
 class Setting extends Component{
@@ -21,6 +17,7 @@ class Setting extends Component{
     selectedTime2 : 1,
     name : "",
     phone_num : "",
+    sort : "커트",
   };
 
   // Date Picker 관련 함수 아래 3개
@@ -50,35 +47,41 @@ class Setting extends Component{
     this.setState({phone_num: i_num})
   }
 
+
   // 예약정보받고 DB에 있는 예약테이블 업데이트
   insertData = async() =>{
 
-    selectedDate_tmp = this.state.selectedDate,
-    selectedTime1_tmp = this.state.selectedTime1,
-    selectedTime2_tmp = this.state.selectedTime2,
+    selectedDate_tmp = this.state.selectedDate;
+    selectedTime1_tmp = this.state.selectedTime1;
+    selectedTime2_tmp = this.state.selectedTime2;
     name_tmp = this.state.name;
-    phone_num_tmp = this.state.phone_num,
+    phone_num_tmp = this.state.phone_num;
+    sort_tmp = this.state.sort;
 
-    //if (selectedDate_tmp && selectedTime1_tmp && selectedTime2_tmp && name_tmp && phone_num_tmp) {
-    await axios.post('http://146.56.170.191/update_res.php', {
-      //date와 time_id 로 유저 찾고, name 과 phone_num과 res_ok 업데이트
-      name: name_tmp,
-      phone_num: phone_num_tmp,
-      res_ok: 1,
-      date: selectedDate_tmp,
-      time_id1: selectedTime1_tmp,
-      time_id2 : selectedTime2_tmp
-    }, { 
-      headers:  {'Content-Type': 'application/json'} 
-    }).then(function (response) {
-      alert('제출 완료');
-      console.log(response);
-    })
-    .catch(function (error) {
-      alert('제출 불가');
-      console.log(error.toJSON());
-    });
-    //}
+    if (selectedDate_tmp && selectedTime1_tmp && selectedTime2_tmp && name_tmp && phone_num_tmp && sort_tmp) {  // input이 모두 입력되어 있어야 서버와 연결해 데이터 넣음
+      await axios.post('http://146.56.170.191/update_res.php', {
+        //date와 time_id 로 유저 찾고, name 과 phone_num과 res_ok 업데이트
+        name: name_tmp,
+        phone_num: phone_num_tmp,
+        sort : sort_tmp,
+        res_ok: 1,
+        date: selectedDate_tmp,
+        time_id1: selectedTime1_tmp,
+        time_id2 : selectedTime2_tmp
+      }, { 
+        headers:  {'Content-Type': 'application/json'} 
+      }).then(function (response) {
+        alert('제출 완료');
+        console.log(response);
+      })
+      .catch(function (error) {
+        alert('제출 불가');
+        console.log(error.toJSON());
+      });
+    }
+    else{
+      alert('입력 부족');
+    }
     
   }
 
@@ -90,7 +93,7 @@ class Setting extends Component{
       enabled={Platform.OS === "ios" ? true : false} flex-1 style={{marginTop:Constants.statusBarHeight}}>
 
           <Button label="날짜 선택" margin-10 onPress={this.showDatePicker}></Button>
-          <DateTimePickerModal
+          <DateTimePickerModal                                                          // 날짜 선택 Picker
             isVisible={this.state.datePickerVisibility}
             mode="date"
             onConfirm={this.handleConfirm}
@@ -101,7 +104,7 @@ class Setting extends Component{
 
             <Text style={{ marginHorizontal: 10, marginBottom: 5}}>{'시작시간'}</Text>
             
-            <Picker style={{}}
+            <Picker style={{}}                                                          // 시작시간 선택 Picker
               selectedValue={this.state.selectedTime1}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({selectedTime1 : itemValue})
@@ -163,7 +166,7 @@ class Setting extends Component{
 
             <Text style={{ marginHorizontal: 10, marginBottom: 5}}>{'끝나는시간'}</Text>
             
-            <Picker style={{}}
+            <Picker style={{}}                                                              // 끝나는 시간 선택 Picker
               selectedValue={this.state.selectedTime2}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({selectedTime2 : itemValue})
@@ -237,8 +240,24 @@ class Setting extends Component{
             placeholder="전화번호를 입력하세요"
             keyboardType="numeric"
             autoFocus={false}
-
           />    
+
+          {/* <View style={{flex: 0.1, marginTop: 50, marginLeft: 10, marginBottom: 40, marginRight: 10}}> */}
+            <Picker style={{marginTop: 20, marginLeft: 10, marginRight: 10}}                // 헤어종류 선택 Picker
+                selectedValue={this.state.sort}
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({sort : itemValue})
+                }>
+              <Picker.Item label="커트" value="커트" />
+              <Picker.Item label="펌" value="펌" />
+              <Picker.Item label="염색" value="염색" />
+              <Picker.Item label="뿌염" value="뿌염" />
+              <Picker.Item label="셋팅펌" value="셋팅펌" />
+              <Picker.Item label="매직" value="매직" />
+              <Picker.Item label="매직셋팅" value="매직셋팅" />
+              <Picker.Item label="다운컷" value="다운컷" />
+            </Picker>
+          {/* </View> */}
 
           <Button label="제출" margin-10 marginT-20 onPress={this.insertData}></Button>
 
@@ -246,7 +265,9 @@ class Setting extends Component{
           <Text>{this.state.selectedTime1}</Text>
           <Text>{this.state.selectedTime2}</Text>
           <Text>{this.state.name}</Text>
-          <Text>{this.state.phone_num}</Text> */}
+          <Text>{this.state.phone_num}</Text>
+          <Text>{this.state.sort}</Text> */}
+
 
           {/* <Button label="뒤로가기" margin-10 onPress={ () => this.props.navigation.goBack() }></Button> */}
 
@@ -256,7 +277,7 @@ class Setting extends Component{
   }
 }
 
-
+// textinput (이름, 전화번호) 스타일 지정
 const styles = StyleSheet.create({
   input: {
     height : '9%',

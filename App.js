@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { Text, Linking } from "react-native";
-import { Constants, View, Button } from 'react-native-ui-lib';
+import React from "react";
+import { Text, BackHandler, Platform, ToastAndroid } from "react-native";
+import { View, Button } from 'react-native-ui-lib';
 import { StatusBar } from 'expo-status-bar';
 import axios from "axios"
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,11 +9,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import Setting from "./Setting";
 import BasicListScreen from "./BasicListScreen";
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import Restart from "./Restart";
 
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createMaterialTopTabNavigator();    // Top 네비게이션 호출
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator();           // Stack 네비게이션 호출
 
 // splash screen을 위한 함수 두개
 function sleep (ms) {
@@ -22,16 +24,16 @@ function sleep (ms) {
   );
 }
 async function delay_splash() {
-    await SplashScreen.preventAutoHideAsync();
-    await sleep(2000);                            // 3초 기다림
-    await SplashScreen.hideAsync();    
+    await SplashScreen.preventAutoHideAsync();    // 스크린 없어지는거 일단 막음
+    await sleep(2000);                            // 2초 기다림
+    await SplashScreen.hideAsync();               // 2초 기다린 후 스크린 없어지게끔
 };
  
 
 class Home extends React.Component {
 
   state = {
-    fontsLoaded: false,
+
   };
 
   // 현재날짜에 value만큼 더한 날짜의 요일을 반환
@@ -62,7 +64,7 @@ class Home extends React.Component {
     return `${date.getDate()}${this.getYoil(order)}`;
   }
 
-  // 현재날짜에 order만큼 더한 날짜를 22 형태로 반환
+  // 현재날짜에 order만큼 더한 날짜를 '22' 형태로 반환
   getTabDay = (order) =>{
     var date = new Date();
     date.setDate(date.getDate() + order);
@@ -76,7 +78,7 @@ class Home extends React.Component {
     return this.getYoil(order);
   }
 
-  // 현재날짜에 order만큼 더한 날짜를 2021-7-18 일 형태로 반환
+  // 현재날짜에 order만큼 더한 날짜를 '2021-7-18' 형태로 반환
   getAfterDate = (order) =>{
     var date = new Date();
     date.setDate(date.getDate() + order);
@@ -87,7 +89,7 @@ class Home extends React.Component {
   // 예약DB에서 날짜와 타임id에 따라 정보 가져오기
   getData = async () => {
     try{
-      const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date.php', {
+      const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date.php', {  
         // date와 time_id로 찾기
         params:{
           date: '2021-07-16',
@@ -100,19 +102,18 @@ class Home extends React.Component {
     }
   }
 
-
   render(){  
     // splash screen 기다리기
-    delay_splash();
+    //delay_splash();
     return (
       <View flex-1  > 
-        <StatusBar style="auto" />
+        <StatusBar style="auto" />    
         {/* <TopNav middleContent="강우리헤어" borderColor="#F5F6F7" middleTextStyle={{fontSize:18, fontWeight:"bold"}}></TopNav> */}
         
           <Tab.Navigator
             initialRouteName="Tab1"                               // 시작 탭 지정
             screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {        // 탭 아이콘 지정 (21수 형태를 21 다음칸 수 형태로 하기위함)
+              tabBarIcon: ({ focused, color, size }) => {        // 탭 아이콘 지정 (21수 형태를 21 다음칸 '수' 형태로 하기위함)
                 if(route.name === 'Tab1'){
                   return (
                     focused ?     // 탭이 포커스된 상태일때 레이블 색 달리해서 표현
@@ -220,6 +221,7 @@ class Home extends React.Component {
                 
               },
             })}
+            backBehavior="none"
             tabBarOptions={{
               activeTintColor: 'black',
               labelStyle: { fontSize: 12, fontWeight: 'bold' },
@@ -228,8 +230,9 @@ class Home extends React.Component {
               scrollEnabled: true,                                // 탭 스크롤 가능
               tabStyle: { width: 54, height: 54 },
               showIcon: true,                                     // 레이블이 아닌 아이콘형태로 보여주기
-              showLabel : false
-            }}>
+              showLabel : false,
+            }}
+            >
             <Tab.Screen
               name="Tab1"
               //component={ListExample}
@@ -237,6 +240,11 @@ class Home extends React.Component {
               options={{ 
                 tabBarLabel: this.getTabLabel(0)    // Tab1의 레이블은 '23목' 형태임
               }}
+              // listeners={({ navigation, route }) => ({
+              //   focus: e => {
+              //     console.log("tab press6");
+              //   },
+              // })}
             />
             <Tab.Screen
               name="Tab2"
@@ -250,31 +258,32 @@ class Home extends React.Component {
             />
             <Tab.Screen
               name="Tab4"
-              children={ ()=><BasicListScreen today={this.getAfterDate(3)}></BasicListScreen> } 
+              children={ ()=><BasicListScreen today={this.getAfterDate(3)} ></BasicListScreen> } 
               options={{ tabBarLabel: this.getTabLabel(3) }}
             />
             <Tab.Screen
               name="Tab5"
-              children={ ()=><BasicListScreen today={this.getAfterDate(4)}></BasicListScreen> } 
+              children={ ()=><BasicListScreen today={this.getAfterDate(4)} ></BasicListScreen> } 
               options={{ tabBarLabel: this.getTabLabel(4) }}
             />
             <Tab.Screen
               name="Tab6"
-              children={ ()=><BasicListScreen today={this.getAfterDate(5)}></BasicListScreen> } 
+              children={ ()=><BasicListScreen today={this.getAfterDate(5)} ></BasicListScreen> } 
               options={{ tabBarLabel: this.getTabLabel(5) }}
             />
             <Tab.Screen
               name="Tab7"
-              children={ ()=><BasicListScreen today={this.getAfterDate(6)}></BasicListScreen> } 
+              children={ ()=><BasicListScreen today={this.getAfterDate(6)} ></BasicListScreen> } 
               options={{ tabBarLabel: this.getTabLabel(6) }}
             />
             <Tab.Screen
               name="Tab8"
-              children={ ()=><BasicListScreen today={this.getAfterDate(7)}></BasicListScreen> } 
+              children={ ()=><BasicListScreen today={this.getAfterDate(7)} ></BasicListScreen> } 
               options={{ tabBarLabel: this.getTabLabel(7) }}
             />
           </Tab.Navigator>
 
+            
           <Button label="예약하기" margin-10 size={Button.sizes.large} onPress={ ()=>this.props.navigation.navigate( 'Setting' ) }></Button>
 
       </View>
@@ -296,26 +305,74 @@ const MyTheme = {
   },
 };
 
-function App() {
+class App extends React.Component {
 
+  // 뒤로가기 버튼눌렀을때 종료되는 이벤트 등록
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  // 뒤로가기 버튼눌렀을때 종료되는 이벤트 해제
+  componentWillUnmount() {
+      this.exitApp = false;
+      BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  // 이벤트 동작
+  handleBackButton = () => {
+    // 2000(2초) 안에 back 버튼을 한번 더 클릭 할 경우 앱 종료
+    if (this.exitApp == undefined || !this.exitApp) {
+        ToastAndroid.show('한번 더 누르시면 종료됩니다.', ToastAndroid.SHORT);
+        this.exitApp = true;
+
+        this.timeout = setTimeout(
+            () => {
+                this.exitApp = false;
+            },
+            2000    // 2초
+        );
+    } else {
+        clearTimeout(this.timeout);
+
+        BackHandler.exitApp();  // 앱 종료
+    }
+    return true;
+  }
+
+
+  render(){
+    // splash screen 기다리기
+    delay_splash();
     return(
-      <NavigationContainer theme={MyTheme}>
-        
-        <Stack.Navigator  initialRouteName="Home"  style={{backgroundColor: 'white'}}>
+      <NavigationContainer theme={MyTheme}>  
+
+        <Stack.Navigator  initialRouteName="Home" >   
           <Stack.Screen name="Home" component={Home}  options={{
             title: '강우리헤어',
             headerTitleStyle: {
-              fontWeight: 'bold',
+              alignSelf : 'center',
+              fontWeight: 'normal',
+              fontSize : 17
             },
+            // headerRight: () => (
+            //   <HeaderButtons >
+            //   { Platform.OS === 'android' ? 
+            //   <Item title="새로고침" onPress={ Restart } />
+            //   : null 
+            //   }
+            // </HeaderButtons>
+            // ),
+            
           }} />
-          <Stack.Screen name="Setting" component={Setting} options={{
+          
+          <Stack.Screen name="Setting" component={Setting} options={{   
             title: '예약하기',
           }} />
         </Stack.Navigator>
 
       </NavigationContainer>
     )
-  
+  }
 }
 
 export default App;
