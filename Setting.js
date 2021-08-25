@@ -10,6 +10,77 @@ class Setting extends Component{
 
   today_tmp = new Date();       //오늘날짜
 
+  // 현재날짜에 value만큼 더한 날짜의 요일을 반환
+  getYoil = (value) =>{
+    const day = new Date().getDay();
+    var addDay = (day + value) % 7;
+    if (addDay == 0) {
+      return "일"
+    } else if (addDay == 1) {
+      return "월"
+    } else if (addDay == 2) {
+      return "화"
+    } else if (addDay == 3) {
+      return "수"
+    } else if (addDay == 4) {
+      return "목"
+    } else if (addDay == 5) {
+      return "금"
+    } else if (addDay == 6) {
+      return "토"
+    }
+  }
+
+  // 현재날짜에 order만큼 더한 날짜를 '21일(수)' 형태로 반환
+  getDateLabel = (order) =>{
+    var date = new Date();
+    date.setDate(date.getDate() + order);
+    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} (${this.getYoil(order)})`;
+  }
+
+  // 현재날짜에 order만큼 더한 날짜를 '2021-8-29' 형태로 반환
+  getDateValue = (order) =>{
+    var date = new Date();
+    date.setDate(date.getDate() + order);
+    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+  }
+
+  // 오늘날짜부터 8일이후까지 날짜를 가진 리스트
+  DateOptions = {
+    date_0 : {
+      label: this.getDateLabel(0),
+      value: this.getDateValue(0)
+    },
+    date_1 : {
+      label: this.getDateLabel(1),
+      value: this.getDateValue(1)
+    },
+    date_2 : {
+      label: this.getDateLabel(2),
+      value: this.getDateValue(2)
+    },
+    date_3 : {
+      label: this.getDateLabel(3),
+      value: this.getDateValue(3)
+    },
+    date_4 : {
+      label: this.getDateLabel(4),
+      value: this.getDateValue(4)
+    },
+    date_5 : {
+      label: this.getDateLabel(5),
+      value: this.getDateValue(5)
+    },
+    date_6 : {
+      label: this.getDateLabel(6),
+      value: this.getDateValue(6)
+    },
+    date_7 : {
+      label: this.getDateLabel(7),
+      value: this.getDateValue(7)
+    },
+  }
+
   state = {
     datePickerVisibility: false,
     selectedDate : `${this.today_tmp.getFullYear()}-${this.today_tmp.getMonth()+1}-${this.today_tmp.getDate()}`, // 기본 날짜는 현재날짜 '2021-7-23' 형태
@@ -21,21 +92,21 @@ class Setting extends Component{
   };
 
   // Date Picker 관련 함수 아래 3개
-  showDatePicker = () => {
-    this.setState({datePickerVisibility : true});
-  };
+  // showDatePicker = () => {
+  //   this.setState({datePickerVisibility : true});
+  // };
 
-  hideDatePicker = () => {
-    this.setState({datePickerVisibility : false});
-  };
+  // hideDatePicker = () => {
+  //   this.setState({datePickerVisibility : false});
+  // };
   
-  handleConfirm = (date) => {
-    console.log("A date has been picked: ", date);
-    var date_tmp = JSON.stringify(date);
-    this.setState({selectedDate : date_tmp.substring(1,11)});
+  // handleConfirm = (date) => {
+  //   console.log("A date has been picked: ", date);
+  //   var date_tmp = JSON.stringify(date);
+  //   this.setState({selectedDate : date_tmp.substring(1,11)});
 
-    this.hideDatePicker();
-  };
+  //   this.hideDatePicker();
+  // };
 
   // State에 있는 name 설정
   setName = (i_name) => {
@@ -50,6 +121,7 @@ class Setting extends Component{
 
   // 예약정보받고 DB에 있는 예약테이블 업데이트
   insertData = async() =>{
+    console.log(this.state.selectedDate);
 
     selectedDate_tmp = this.state.selectedDate;
     selectedTime1_tmp = this.state.selectedTime1;
@@ -92,15 +164,36 @@ class Setting extends Component{
       keyboardVerticalOffset={Platform.OS == "ios" ? 0 : 20}
       enabled={Platform.OS === "ios" ? true : false} flex-1 style={{marginTop:Constants.statusBarHeight}}>
 
-          <Button label="날짜 선택" margin-10 onPress={this.showDatePicker}></Button>
-          <DateTimePickerModal                                                          // 날짜 선택 Picker
+          {/* <Button label="날짜 선택" margin-10 onPress={this.showDatePicker}></Button>
+          <DateTimePickerModal                                                          // 날짜 선택 Picker1 -> 달력형태
             isVisible={this.state.datePickerVisibility}
             mode="date"
             onConfirm={this.handleConfirm}
             onCancel={this.hideDatePicker}
-          />
+          /> */}
 
           <View style={{flex: 0.1, margin: 10}}>
+
+            <Text style={{ marginHorizontal: 10, marginBottom: 5}}>{'날짜선택'}</Text>
+            
+            <Picker style={{}}                                                          // 날짜 선택 Picker2 -> 스크롤 리스트 형태
+              selectedValue={this.state.selectedDate}
+              onValueChange={(itemValue, itemIndex) =>
+                this.setState({selectedDate : itemValue})
+              }>
+              <Picker.Item label={this.DateOptions.date_0.label} value={this.DateOptions.date_0.value}  />
+              <Picker.Item label={this.DateOptions.date_1.label} value={this.DateOptions.date_1.value}  />
+              <Picker.Item label={this.DateOptions.date_2.label} value={this.DateOptions.date_2.value}  />
+              <Picker.Item label={this.DateOptions.date_3.label} value={this.DateOptions.date_3.value}  />
+              <Picker.Item label={this.DateOptions.date_4.label} value={this.DateOptions.date_4.value}  />
+              <Picker.Item label={this.DateOptions.date_5.label} value={this.DateOptions.date_5.value}  />
+              <Picker.Item label={this.DateOptions.date_6.label} value={this.DateOptions.date_6.value}  />
+              <Picker.Item label={this.DateOptions.date_7.label} value={this.DateOptions.date_7.value}  />
+
+            </Picker>
+          </View>
+
+          <View style={{flex: 0.1, marginTop: 50, marginLeft: 10, marginBottom: 10, marginRight: 10}}>
 
             <Text style={{ marginHorizontal: 10, marginBottom: 5}}>{'시작시간'}</Text>
             
