@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, BackHandler, Platform, ToastAndroid } from "react-native";
+import { Text, BackHandler, Platform, ToastAndroid, Alert } from "react-native";
 import { View, Button } from 'react-native-ui-lib';
 import { StatusBar } from 'expo-status-bar';
 import axios from "axios"
@@ -8,6 +8,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { createStackNavigator } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import Setting from "./Setting";
+import SettingNotice from "./SettingNotice";
 import BasicListScreen from "./BasicListScreen";
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import Restart from "./Restart";
@@ -283,9 +284,11 @@ class Home extends React.Component {
             />
           </Tab.Navigator>
 
-            
-          <Button label="예약하기" margin-10 size={Button.sizes.large} onPress={ ()=>this.props.navigation.navigate( 'Setting' ) }></Button>
-
+          <View margin-10 style={[{flexDirection:'row'}]}> 
+            <Button label="공지 작성하기" flex-1 marginR-5 size={Button.sizes.large} onPress={ ()=>this.props.navigation.navigate( 'SettingNotice' ) }></Button>
+            <Button label="예약하기" flex-1 marginL-5 size={Button.sizes.large} onPress={ ()=>this.props.navigation.navigate( 'Setting' ) }></Button>
+          </View>
+          
       </View>
     );
   }
@@ -306,6 +309,10 @@ const MyTheme = {
 };
 
 class App extends React.Component {
+
+  state = {
+    notice_msg : "없음"
+  };
 
   // 뒤로가기 버튼눌렀을때 종료되는 이벤트 등록
   componentDidMount() {
@@ -339,10 +346,38 @@ class App extends React.Component {
     return true;
   }
 
+  // 공지DB에서 가장 최근에 입력한 공지 1건 가져오기
+  getData = async () => {
+    try{
+      const { data : { data } } = await axios.get('http://146.56.170.191/select_notice.php');
+
+      if (data) {
+        this.setState({ notice_msg: data[0].message })
+      }
+      else{
+        this.setState({ notice_msg: "없음" })
+      }
+    } catch (error){
+      console.error(error);
+    }
+  }
+
+  // 공지사항창 띄우기
+  noticeAlert = () => {
+    this.getData();
+
+    Alert.alert("공지사항", this.state.notice_msg, [
+      { text: "예", onPress: () => console.log("Yes Pressed")  }
+    ]);
+
+  }
+
 
   render(){
     // splash screen 기다리기
     delay_splash();
+    this.getData();
+    this.noticeAlert();
     return(
       <NavigationContainer theme={MyTheme}>  
 
@@ -350,23 +385,24 @@ class App extends React.Component {
           <Stack.Screen name="Home" component={Home}  options={{
             title: '강우리헤어',
             headerTitleStyle: {
-              alignSelf : 'center',
+              //alignSelf : 'center',
               fontWeight: 'normal',
               fontSize : 17
             },
-            // headerRight: () => (
-            //   <HeaderButtons >
-            //   { Platform.OS === 'android' ? 
-            //   <Item title="새로고침" onPress={ Restart } />
-            //   : null 
-            //   }
-            // </HeaderButtons>
-            // ),
+            headerRight: () => (
+              <HeaderButtons >
+                <Item title="공지" onPress={ () => this.noticeAlert() } />
+              </HeaderButtons>
+            ),
             
           }} />
           
           <Stack.Screen name="Setting" component={Setting} options={{   
             title: '예약하기',
+          }} />
+
+          <Stack.Screen name="SettingNotice" component={SettingNotice} options={{   
+            title: '공지 작성하기',
           }} />
         </Stack.Navigator>
 
