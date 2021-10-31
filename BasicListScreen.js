@@ -180,7 +180,8 @@ class MyListItem extends React.PureComponent{
     
       await axios.post('http://146.56.170.191/update_res2.php', {
         date: this.props.date,  
-        time_id : this.props.time_range_id
+        time_id : this.props.time_range_id,
+        msg : 'thisisupdateres2'
       }, { 
         headers:  {'Content-Type': 'application/json'} 
       }).then(function (response) {
@@ -292,11 +293,17 @@ export default class BasicListScreen extends Component {
   // 예약DB에서 날짜에 따라 정보 가져오기
   getData = async () => {
     try{
-      const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date2.php', {
+      // const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date2.php', {
+      //   // 오늘날짜로 data 가져오기
+      //   params:{
+      //     date: this.today,  
+      //   }  
+      // });
+
+      const { data : { data } } = await axios.post('http://146.56.170.191/select_with_date2.php', {
         // 오늘날짜로 data 가져오기
-        params:{
-          date: this.today,  
-        }  
+        date: this.today,  
+        msg: 'thisisselectdate2'
       });
 
       const {listData} = this.state;  

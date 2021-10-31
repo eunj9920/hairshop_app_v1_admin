@@ -4,7 +4,7 @@ import { Constants, View, Button } from 'react-native-ui-lib';
 import axios from "axios"
 
 
-class Setting extends Component{
+class SettingNotice extends Component{
 
   today_tmp = new Date();       //오늘날짜
 
@@ -30,6 +30,7 @@ class Setting extends Component{
       await axios.post('http://146.56.170.191/insert_notice.php', {
         msg: msg_tmp,
         date: date_tmp,
+        chkmsg: 'thisisinsertnotice'
       }, { 
         headers:  {'Content-Type': 'application/json'} 
       }).then(function (response) {
@@ -51,7 +52,7 @@ class Setting extends Component{
   deleteData = async () => {
     
     await axios.post('http://146.56.170.191/delete_notice.php', {
-      
+      msg: 'thisisdeletenotice'
     }, { 
       headers:  {'Content-Type': 'application/json'} 
     }).then(function (response) {
@@ -106,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Setting;
+export default SettingNotice;

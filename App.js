@@ -88,20 +88,20 @@ class Home extends React.Component {
 
 
   // 예약DB에서 날짜와 타임id에 따라 정보 가져오기
-  getData = async () => {
-    try{
-      const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date.php', {  
-        // date와 time_id로 찾기
-        params:{
-          date: '2021-07-16',
-          time_id: 25
-        }  
-      });
-      console.log(data);
-    } catch (error){
-      console.error(error);
-    }
-  }
+  // getData = async () => {
+  //   try{
+  //     const { data : { data } } = await axios.get('http://146.56.170.191/select_with_date.php', {  
+  //       // date와 time_id로 찾기
+  //       params:{
+  //         date: '2021-07-16',
+  //         time_id: 25
+  //       }  
+  //     });
+  //     console.log(data);
+  //   } catch (error){
+  //     console.error(error);
+  //   }
+  // }
 
   render(){  
     // splash screen 기다리기
@@ -349,8 +349,10 @@ class App extends React.Component {
   // 공지DB에서 가장 최근에 입력한 공지 1건 가져오기
   getData = async () => {
     try{
-      const { data : { data } } = await axios.get('http://146.56.170.191/select_notice.php');
-
+      const { data : { data } } = await axios.post('http://146.56.170.191/select_notice.php',{
+        msg: 'thisisselectnotice'
+      });
+        
       if (data) {
         this.setState({ notice_msg: data[0].message })
       }
@@ -377,7 +379,7 @@ class App extends React.Component {
     // splash screen 기다리기
     delay_splash();
     this.getData();
-    this.noticeAlert();
+    // this.noticeAlert();
     return(
       <NavigationContainer theme={MyTheme}>  
 

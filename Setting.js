@@ -139,7 +139,8 @@ class Setting extends Component{
         res_ok: 1,
         date: selectedDate_tmp,
         time_id1: selectedTime1_tmp,
-        time_id2 : selectedTime2_tmp
+        time_id2 : selectedTime2_tmp,
+        msg: 'thisisupdateres'
       }, { 
         headers:  {'Content-Type': 'application/json'} 
       }).then(function (response) {
